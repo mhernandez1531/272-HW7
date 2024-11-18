@@ -42,10 +42,25 @@ public class ProblemSolutions {
             // "SELECTION SORT" ALGORITHM.
             // DO NOT FORGET TO ADD YOUR NAME / SECTION ABOVE
 
+            // Index variable keeps track of the position of the min/max element
+            int index = i;
+
+            // checks every element after 'i' to find the mix/max depending on the order
+            for (int j = i + 1; j < n; j++) {
+
+                // when sorting ascending we find min element
+                // sorting descending we find max element
+                if (ascending ? values[j] < values[index] : values[j] > values[index]) {
+                    index = j; // Update  index of the min/max value
+                }
+            }
+
+            // Swap values at positions 'i' and 'index' to place the smallest/largest element in correct spot
+            int temp = values[index]; // Temp var to hold one of the values during the swap
+            values[index] = values[i]; // Put the min/max at the front (position i)
+            values[i] = temp; // Put  old value in new position
         }
-
-    } // End class selectionSort
-
+    }
 
     /**
      *  Method mergeSortDivisibleByKFirst
@@ -101,9 +116,58 @@ public class ProblemSolutions {
         // ALLOCATES AUXILIARY DATA STRUCTURES (TEMPORARY ARRAYS). IT WILL BE EASIER
         // TO CODE WITH A SPACE COMPLEXITY OF O(N LOG N), WHICH IS FINE FOR PURPOSES
         // OF THIS PROGRAMMING EXERCISES.
+        // Temporary arrays for left and right subarrays
 
-        return;
+        // Create two temp arrays for left and right subarrays
+        int[] leftArr = new int[mid - left + 1];
+        int[] rightArr = new int[right - mid];
 
+        // Copy data to temporary arrays
+        for (int i = 0; i < leftArr.length; i++) {
+            leftArr[i] = arr[left + i]; // copy left half
+        }
+        for (int i = 0; i < rightArr.length; i++) {
+            rightArr[i] = arr[mid + 1 + i]; // copy right half
+        }
+
+        // Indices for traversing the temporary arrays
+        int i = 0, j = 0, kIndex = left;
+
+        // First, merge all numbers divisible by k into the main array
+        while (i < leftArr.length && j < rightArr.length) {
+            // if left array  number is divisible by k and right array number is not
+            if (leftArr[i] % k == 0 && rightArr[j] % k != 0) {
+                arr[kIndex++] = leftArr[i++]; // Add left array number to main array
+            }
+            // if right array number is divisible by k and left array number is not
+            else if (rightArr[j] % k == 0 && leftArr[i] % k != 0) {
+                arr[kIndex++] = rightArr[j++]; // Add right array number to main array
+            }
+            // if both numbers are divisible by k, add smaller one to main array
+            else if (leftArr[i] % k == 0) {
+                arr[kIndex++] = leftArr[i++];
+            }
+            else if (rightArr[j] % k == 0) {
+                arr[kIndex++] = rightArr[j++];
+            }
+            // if both numbers are not divisible by k, merge them in ascending order
+            else if (leftArr[i] <= rightArr[j]) {
+                arr[kIndex++] = leftArr[i++]; // Add smaller number from leftArr
+            }
+            else {
+                arr[kIndex++] = rightArr[j++]; // Add smaller number from rightArr
+            }
+        }
+
+        // if there are remaining elements from leftArray copy them
+            while (i < leftArr.length) {
+            arr[kIndex++] = leftArr[i++];
+        }
+
+        // if there is any copy remaining elements from rightArr
+        while (j < rightArr.length) {
+            arr[kIndex++] = rightArr[j++];
+        }
     }
 
 
@@ -156,8 +220,20 @@ public class ProblemSolutions {
 
         // YOUR CODE GOES HERE, CONSIDER USING ARRAYS.SORT()
 
-        return false;
+        // sort array of asteroids to try and destroy smallest ones first
+        Arrays.sort(asteroids);
 
+        // convert planet mass to long to avoid overflow if mass of asteroids is large
+        long planetMass = mass; // long to avoid overflow
+        // loop through all asteroids in the sorted array
+        for (int asteroid : asteroids) {
+            // If planet's mass is less than asteroid's mass, planet gets destroyed
+            // return false because the planet won't survive this asteroid
+            if (planetMass < asteroid) return false;
+            // If planet survives, it gains the mass of the asteroid
+            planetMass += asteroid;
+        }
+        return true;
     }
 
 
@@ -194,9 +270,29 @@ public class ProblemSolutions {
 
         // YOUR CODE GOES HERE, CONSIDER USING ARRAYS.SORT
 
-        return -1;
+        // sort array to easily pair the lightest and heaviest people together
+        Arrays.sort(people);
 
+        int left = 0; // left starts from the lightest person (start of the array)
+        int right = people.length - 1;  // right starts from the heaviest person (end of the array)
+
+        // Variable to count  number of sleds needed
+        int sleds = 0;
+
+        // Loop until all people are accounted for
+        while (left <= right) {
+            // If lightest and heaviest people together fit within the limit
+            // pair them on a single sled, so move both pointers inward
+            if (people[left] + people[right] <= limit) {
+                left++;
+            }
+            // Move right pointer to consider  next heaviest person
+            // This person gets their own sled if they can’t pair with 'left'
+            right--;
+            sleds++;
+        }
+
+        return sleds; // total number of sleds used
     }
 
 } // End Class ProblemSolutions
-
